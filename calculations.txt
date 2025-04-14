@@ -1,0 +1,2 @@
+Average events per day: 11.50
+Total events stored: 23
