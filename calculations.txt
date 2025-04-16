@@ -1,2 +1,5 @@
-Average events per day: 11.50
-Total events stored: 23
+Average events per day: 12.00
+Total events stored: 24
+Events per day:
+  2025-04-30: 14
+  2025-05-01: 10
