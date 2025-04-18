@@ -163,8 +163,8 @@ def main():
     """Main function to gather Ticketmaster events and store in database."""
     init_database()
     city = input("Enter a city (e.g., New York, Chicago): ").strip().title()
-    start_date = "2025-05-01"
-    end_date = "2025-05-31"
+    start_date = "2025-04-18"
+    end_date = "2025-04-23"
     api_key = "G1SnItHhk6foswTJuIHEw7iPa9qwb8Ak"
     
     events = fetch_ticketmaster_events(city, start_date, end_date, api_key)
