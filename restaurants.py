@@ -29,7 +29,6 @@ def search_restaurants(city):
 
     response = requests.get(url, headers=headers, params=querystring)
 
-    print(response.json())
     return response.json()
 
 
@@ -116,8 +115,7 @@ def restaurants_call(cur,conn,city):
         create_cuisines_table(data,cur,conn)
         create_restaurants_table(data,cur,conn)
     restaurant_calc(city,cur,conn)
-cur,conn = setup_database("weather.db")
-restaurants_call(cur,conn,"Mumbai")
+
 
 
 
