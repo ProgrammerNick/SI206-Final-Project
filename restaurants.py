@@ -2,6 +2,7 @@ import requests
 import sqlite3
 import json
 import os
+import matplotlib.pyplot as plt
 def search_restaurants(city):
     url = "https://tripadvisor16.p.rapidapi.com/api/v1/restaurant/searchLocation"
 
@@ -69,12 +70,48 @@ def create_restaurants_table(restaurants,cur,conn):
                     cuisine_id) VALUES (?,?,?,?,?)""",(name,city_id,rating,r_count,cuisine_id))
         conn.commit()
 
-
+def restaurant_calc(city,cur,conn):
+    cur.execute("SELECT id, cuisine FROM Cuisines")
+    cuisines = cur.fetchall()
+    l_cuisine=[]
+    l_count=[]
+    l_rating=[]
+    for cid, cname in cuisines:
+        cur.execute("SELECT ROUND(AVG(rating),1) FROM Restaurants JOIN Cities ON Restaurants.City_id = Cities.id WHERE Cities.city= ? and Restaurants.cuisine_id = ? ",(city,cid))
+        result1 = cur.fetchone()[0]
+        cur.execute("SELECT ROUND(AVG(user_review_count)) FROM Restaurants JOIN Cities ON Restaurants.City_id = Cities.id WHERE Cities.city= ? and Restaurants.cuisine_id = ? ",(city,cid))
+        result2 = cur.fetchone()[0]
+        cur.execute("SELECT name FROM Restaurants JOIN Cities ON Restaurants.City_id = Cities.id WHERE Cities.city= ? and Restaurants.cuisine_id = ? ORDER BY Restaurants.rating DESC LIMIT 1",(city,cid))
+        result3 = cur.fetchone()
+        if result1:
+            print(f"{cname} Restaurants")
+            print(f"Average Rating: {result1}")
+            print(f"Average number of User Reviews: {result2}")
+            print(f"Highest-rated Restaurant: {result3[0]}")
+            print()
+            l_cuisine.append(cname)
+            l_rating.append(result1)
+            cur.execute("SELECT COUNT(*) FROM Restaurants JOIN Cities ON Restaurants.City_id = Cities.id WHERE Cities.city= ? and Restaurants.cuisine_id = ? ",(city,cid))
+            l_count.append(cur.fetchone()[0])
+    plt.figure(figsize=(12, 6))
+    plt.subplot(1, 2, 1)
+    plt.bar(l_cuisine, l_rating, color='skyblue')
+    plt.ylim(0, 5)
+    plt.title("Average Rating per Cuisine")
+    plt.xlabel("Cuisine")
+    plt.ylabel("Avg Rating")
+    plt.xticks(rotation=45, ha='right')
+    plt.subplot(1, 2, 2)
+    plt.pie(l_count, labels=l_cuisine, autopct='%1.0f%%', startangle=90, labeldistance=1.1)
+    plt.title("Cuisine Popularity")
+    plt.tight_layout()
+    plt.show()
 cur,conn = setup_database("weather.db")
-data=search_restaurants("Chicago")
-create_cuisines_table(data,cur,conn)
-create_restaurants_table(data,cur,conn)
+#data=search_restaurants("Chicago")
+# create_cuisines_table(data,cur,conn)
+# create_restaurants_table(data,cur,conn)
+restaurant_calc("New York City",cur,conn)
 
-    
+
 
 
