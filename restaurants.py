@@ -9,7 +9,7 @@ def search_restaurants(city):
     querystring = {"query":city}
 
     headers = {
-	    "x-rapidapi-key": "758e598c8fmshb7d3bf640dcdc09p195b67jsn08fee0e48bee",
+	    "x-rapidapi-key": 'd413013ed7msh1c3d3bacccde12fp1ab893jsn3fb585b475de',
 	    "x-rapidapi-host": "tripadvisor16.p.rapidapi.com"
     }
 
@@ -23,7 +23,7 @@ def search_restaurants(city):
     querystring = {"locationId":r}
 
     headers = {
-	    "x-rapidapi-key": "758e598c8fmshb7d3bf640dcdc09p195b67jsn08fee0e48bee",
+	    "x-rapidapi-key": 'd413013ed7msh1c3d3bacccde12fp1ab893jsn3fb585b475de',
 	    "x-rapidapi-host": "tripadvisor16.p.rapidapi.com"
     }
 
