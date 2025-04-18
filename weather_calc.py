@@ -3,6 +3,7 @@ from collections import Counter
 import matplotlib
 import matplotlib.pyplot as plt
 import time
+import sys
 
 def daily_high_and_low(cur, date, city):
     cur.execute("SELECT id from Cities WHERE city = ?", (city,))
@@ -60,7 +61,7 @@ def create_avg_chart(cur, city, data):
     ax2.tick_params(axis='y', labelcolor='b')
 
     plt.title(f'Weather Trends in {city}')
-
+    plt.savefig("weather_line_graph.png")
     plt.show()
 
 def write_calculations(avg_data, temp_data, filename, city):
@@ -88,6 +89,31 @@ def write_calculations(avg_data, temp_data, filename, city):
             lines.append(f"Most common conditions for {month}/{day}/{year} in {city}: {tple[5]}.\n\n")
         #print(lines)
         f.writelines(lines)
+
+def run_weather_app(city, date):
+    cur, conn = weather.setup_weather_database("weather.db")
+    weather.create_conditions_table(cur, conn)
+    weather.create_cities_table(cur, conn)
+    averages = []
+    high_and_low = []
+    date = int(date)
+    for i in range(5):
+         #print(date)
+        weather_dict = weather.search_for_weather(city)
+        if isinstance(weather_dict, str):
+            print(weather_dict)
+            sys.exit(1)
+        weather.create_weather_table(weather_dict, cur, conn, i)
+        averages.append(daily_avg(cur, date, city))
+        high_and_low.append(daily_high_and_low(cur, date, city))
+        date += 1
+        time.sleep(2)
+    #print(averages)
+    #print(high_and_low)
+    create_avg_chart(cur, city, averages)
+    write_calculations(averages, high_and_low, "weather_calculations.txt", city)
+
+    #print(weather_dict)
 
 """def main():
     weather_dict = weather.search_for_weather("Ann Arbor")

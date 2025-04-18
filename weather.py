@@ -3,10 +3,6 @@ import json
 import os
 import requests
 import re
-from collections import Counter
-import matplotlib
-import matplotlib.pyplot as plt
-import time
 
 API_KEY = 'GLVTG3EDCK29FQPYLQLS6Q3F4'
 
@@ -146,72 +142,6 @@ def create_cities_table(cur, conn):
         for i in range(len(lines)):
             cur.execute("INSERT OR IGNORE INTO Cities (id, city) VALUES (?,?)", (i, lines[i]))
         conn.commit()
-
-def daily_high_and_low(cur, date, city):
-    cur.execute("SELECT id from Cities WHERE city = ?", (city,))
-    city_id = int(cur.fetchone()[0])
-    cur.execute("SELECT MIN(temperature) from Weather WHERE city_id = ? AND date = ?", (city_id, date))
-    min_temp = int(cur.fetchone()[0])
-    cur.execute("SELECT MAX(temperature) from Weather WHERE city_id = ? AND date = ?", (city_id, date))
-    max_temp = int(cur.fetchone()[0])
-    with open("Calculations.txt", 'w') as f:
-        lines = []
-        date_str = str(date)
-        year = date_str[0:4]
-        month = date_str[5:6]
-        day = date_str[-2:-1]
-        lines.append(f"Maximum Temperature for {month}/{day}/{year} in {city}: {max_temp}.")
-        lines.append(f"Minimum Temperature for {month}/{day}/{year} in {city}: {min_temp}.")
-        f.writelines(lines)
-    return max_temp, min_temp
-
-def daily_avg(cur, day, city):
-    cur.execute("SELECT id from Cities WHERE city = ?", (city,))
-    city_id = int(cur.fetchone()[0])
-    cur.execute("""SELECT temperature, humidity, wind_speed, uv_index, chance_of_precipitation, 
-                conditions_id FROM Weather
-                WHERE city_id = ? AND date = ?""", (city_id, day))
-    data = cur.fetchall()
-    temp = round(sum(x[0] for x in data) / 24, 1)
-    humidity = round(sum(x[1] for x in data) / 24, 1)
-    wind_speed = round(sum(x[2] for x in data) / 24, 1)
-    uv_index = round(sum(x[3] for x in data) / 24, 1)
-    precip = round(sum(x[4] for x in data) / 24, 1)
-    conditions_lst = [x[5] for x in data]
-    con_id = Counter(conditions_lst).most_common(1)[0][0]
-    cur.execute("SELECT description from Conditions WHERE id = ?", (con_id,))
-    conditions = cur.fetchone()[0]
-    return temp, humidity, wind_speed, uv_index, precip, conditions
-
-def create_avg_chart(cur, city, data):
-    cur.execute("""SELECT DISTINCT Weather.date, Cities.city 
-                FROM Weather 
-                JOIN Cities ON Weather.city_id = Cities.id
-                WHERE Cities.city = ?""", (city,))
-
-    dates = [row[0] for row in cur.fetchall()]
-    temp = [row[0] for row in data]
-    humidity = [row[1] for row in data]
-    print(dates)
-    print(temp)
-    fig, ax1 = plt.subplots()
-
-    ax1.plot(dates, temp, 'r-', label='Temperature (°F)')
-    ax1.set_ylabel('Temperature (°F)', color='r')
-    ax1.tick_params(axis='y', labelcolor='r')
-
-    ax1.set_xlabel("Date")
-
-    ax2 = ax1.twinx()
-
-    # Plot humidity on the right Y-axis
-    ax2.plot(dates, humidity, 'b--', label='Humidity (%)')
-    ax2.set_ylabel('Humidity (%)', color='b')
-    ax2.tick_params(axis='y', labelcolor='b')
-
-    plt.title(f'Weather Trends in {city}')
-
-    plt.show()
 
 """def main():
     weather_dict = search_for_weather("Ann Arbor")
