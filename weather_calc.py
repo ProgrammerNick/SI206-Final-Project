@@ -61,7 +61,7 @@ def create_avg_chart(cur, city, data):
     ax2.tick_params(axis='y', labelcolor='b')
 
     plt.title(f'Weather Trends in {city}')
-
+    plt.savefig("weather_line_graph.png")
     plt.show()
 
 def write_calculations(avg_data, temp_data, filename, city):
