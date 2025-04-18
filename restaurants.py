@@ -76,6 +76,8 @@ def restaurant_calc(city,cur,conn):
     l_cuisine=[]
     l_count=[]
     l_rating=[]
+    f=open("RestaurantsReport.txt","w")
+    f.write(f"Restaurants Report for {city}\n\n")
     for cid, cname in cuisines:
         cur.execute("SELECT ROUND(AVG(rating),1) FROM Restaurants JOIN Cities ON Restaurants.City_id = Cities.id WHERE Cities.city= ? and Restaurants.cuisine_id = ? ",(city,cid))
         result1 = cur.fetchone()[0]
@@ -84,15 +86,15 @@ def restaurant_calc(city,cur,conn):
         cur.execute("SELECT name FROM Restaurants JOIN Cities ON Restaurants.City_id = Cities.id WHERE Cities.city= ? and Restaurants.cuisine_id = ? ORDER BY Restaurants.rating DESC LIMIT 1",(city,cid))
         result3 = cur.fetchone()
         if result1:
-            print(f"{cname} Restaurants")
-            print(f"Average Rating: {result1}")
-            print(f"Average number of User Reviews: {result2}")
-            print(f"Highest-rated Restaurant: {result3[0]}")
-            print()
+            f.write(f"{cname} Restaurants\n")
+            f.write(f"Average Rating: {result1}\n")
+            f.write(f"Average number of User Reviews: {result2}\n")
+            f.write(f"Highest-rated Restaurant: {result3[0]}\n\n")
             l_cuisine.append(cname)
             l_rating.append(result1)
             cur.execute("SELECT COUNT(*) FROM Restaurants JOIN Cities ON Restaurants.City_id = Cities.id WHERE Cities.city= ? and Restaurants.cuisine_id = ? ",(city,cid))
             l_count.append(cur.fetchone()[0])
+    f.close()
     plt.figure(figsize=(12, 6))
     plt.subplot(1, 2, 1)
     plt.bar(l_cuisine, l_rating, color='skyblue')
@@ -106,11 +108,16 @@ def restaurant_calc(city,cur,conn):
     plt.title("Cuisine Popularity")
     plt.tight_layout()
     plt.show()
+def restaurants_call(cur,conn,city):
+    cur.execute("SELECT city_id FROM Restaurants JOIN Cities ON Cities.id = Restaurants.city_id WHERE Cities.city=?",(city,))
+    check=cur.fetchone()
+    if(not check):
+        data=search_restaurants(city)
+        create_cuisines_table(data,cur,conn)
+        create_restaurants_table(data,cur,conn)
+    restaurant_calc(city,cur,conn)
 cur,conn = setup_database("weather.db")
-#data=search_restaurants("Chicago")
-# create_cuisines_table(data,cur,conn)
-# create_restaurants_table(data,cur,conn)
-restaurant_calc("New York City",cur,conn)
+restaurants_call(cur,conn,"Mumbai")
 
 
 
