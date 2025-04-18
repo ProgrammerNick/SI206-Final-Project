@@ -15,7 +15,7 @@ def main():
     weather.create_cities_table(cur, conn)
     averages = []
     high_and_low = []
-    date = 20250418
+    date = int(date)
     for i in range(5):
         #print(date)
         weather.create_weather_table(weather_dict, cur, conn, i)
@@ -25,7 +25,7 @@ def main():
         time.sleep(2)
     #print(averages)
     #print(high_and_low)
-    weather_calc.create_avg_chart(cur, date, averages)
+    weather_calc.create_avg_chart(cur, city, averages)
     weather_calc.write_calculations(averages, high_and_low, "weather_calculations.txt", city)
 
     #print(weather_dict)
