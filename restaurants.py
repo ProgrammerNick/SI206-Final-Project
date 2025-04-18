@@ -106,6 +106,7 @@ def restaurant_calc(city,cur,conn):
     plt.pie(l_count, labels=l_cuisine, autopct='%1.0f%%', startangle=90, labeldistance=1.1)
     plt.title("Cuisine Popularity")
     plt.tight_layout()
+    plt.savefig("RestaurantsVisual.png")
     plt.show()
 def restaurants_call(cur,conn,city):
     cur.execute("SELECT city_id FROM Restaurants JOIN Cities ON Cities.id = Restaurants.city_id WHERE Cities.city=?",(city,))
