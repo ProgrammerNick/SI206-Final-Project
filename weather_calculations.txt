@@ -1,0 +1,52 @@
+Weather data for New York
+
+Maximum temperature for 41/18/2025 in New York: 67.
+Minimum temperature for 41/18/2025 in New York: 47.
+
+Maximum temperature for 41/19/2025 in New York: 83.
+Minimum temperature for 41/19/2025 in New York: 58.
+
+Maximum temperature for 42/20/2025 in New York: 69.
+Minimum temperature for 42/20/2025 in New York: 54.
+
+Maximum temperature for 42/21/2025 in New York: 54.
+Minimum temperature for 42/21/2025 in New York: 49.
+
+Maximum temperature for 42/22/2025 in New York: 72.
+Minimum temperature for 42/22/2025 in New York: 53.
+
+Average temperature for 41/18/2025 in New York: 55.0.
+Average humidity for 41/18/2025 in New York: 37.3.
+Average wind speed for 41/18/2025 in New York: 7.1.
+Average UV index for 41/18/2025 in New York: 2.6.
+Average chance of precipitation for 41/18/2025 in New York: 0.7.
+Most common conditions for 41/18/2025 in New York: Partially cloudy.
+
+Average temperature for 41/19/2025 in New York: 67.6.
+Average humidity for 41/19/2025 in New York: 53.9.
+Average wind speed for 41/19/2025 in New York: 13.8.
+Average UV index for 41/19/2025 in New York: 2.1.
+Average chance of precipitation for 41/19/2025 in New York: 8.4.
+Most common conditions for 41/19/2025 in New York: Partially cloudy.
+
+Average temperature for 42/20/2025 in New York: 58.9.
+Average humidity for 42/20/2025 in New York: 38.4.
+Average wind speed for 42/20/2025 in New York: 12.0.
+Average UV index for 42/20/2025 in New York: 2.8.
+Average chance of precipitation for 42/20/2025 in New York: 1.3.
+Most common conditions for 42/20/2025 in New York: Partially cloudy.
+
+Average temperature for 42/21/2025 in New York: 50.2.
+Average humidity for 42/21/2025 in New York: 46.5.
+Average wind speed for 42/21/2025 in New York: 7.8.
+Average UV index for 42/21/2025 in New York: 1.3.
+Average chance of precipitation for 42/21/2025 in New York: 9.0.
+Most common conditions for 42/21/2025 in New York: Partially cloudy.
+
+Average temperature for 42/22/2025 in New York: 60.4.
+Average humidity for 42/22/2025 in New York: 57.9.
+Average wind speed for 42/22/2025 in New York: 8.7.
+Average UV index for 42/22/2025 in New York: 2.5.
+Average chance of precipitation for 42/22/2025 in New York: 30.0.
+Most common conditions for 42/22/2025 in New York: Partially cloudy.
+

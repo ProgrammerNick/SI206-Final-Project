@@ -1,8 +1,9 @@
 import requests
 import sqlite3
 import os
-from datetime import datetime, timedelta
-import time
+from datetime import datetime
+import re
+from display_ticketmaster import visualize_data
 
 def init_database(db_name="weather.db"):
     """Initialize SQLite database with Events and Venues tables.
@@ -14,13 +15,7 @@ def init_database(db_name="weather.db"):
     db_path = os.path.join(path, db_name)
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    # Ensure Cities table exists (in case weather.py hasn't run)
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS Cities (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            city TEXT UNIQUE
-        )
-    """)
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS Venues (
             venue_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -32,7 +27,7 @@ def init_database(db_name="weather.db"):
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS Events (
             event_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
+            name TEXT UNIQUE,
             date TEXT,
             venue_id INTEGER,
             price_range TEXT,
@@ -40,26 +35,33 @@ def init_database(db_name="weather.db"):
         )
     """)
     conn.commit()
-    print(f"Initialized tables in {db_path}")
     conn.close()
 
-def fetch_ticketmaster_events(city, start_date, end_date, api_key, max_items=25):
-    """Fetch events from Ticketmaster API for a city and date range.
+def fetch_ticketmaster_events(city, event_date, api_key, max_items=25):
+    """Fetch events from Ticketmaster API for a city and single date.
     
     Input: 
         city (str) - City name (e.g., 'New York')
-        start_date (str) - Start date in YYYY-MM-DD
-        end_date (str) - End date in YYYY-MM-DD
+        event_date (str) - Event date in YYYY-MM-DD
         api_key (str) - Ticketmaster API key
         max_items (int) - Max events to fetch per call
     Output: List of (name, date, venue_name, city, price_range) tuples
     """
     url = "https://app.ticketmaster.com/discovery/v2/events.json"
+
+    pattern = r'^\d{4}-\d{2}-\d{2}$'
+    if not re.match(pattern, event_date):
+        year = event_date[:4]
+        month = event_date[4:6]
+        day = event_date[6:]
+    else:
+        year, month, day = event_date.split('-')
+
     params = {
         "apikey": api_key,
         "city": city,
-        "startDateTime": f"{start_date}T00:00:00Z",
-        "endDateTime": f"{end_date}T23:59:59Z",
+        "startDateTime": f"{year}-{month}-{day}T00:00:00Z",
+        "endDateTime": f"{year}-{month}-{day}T23:59:59Z",
         "size": str(max_items),
         "sort": "date,asc"
     }
@@ -67,10 +69,7 @@ def fetch_ticketmaster_events(city, start_date, end_date, api_key, max_items=25)
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
     }
     try:
-        print(f"Querying Ticketmaster for city: {city}")
         response = requests.get(url, params=params, headers=headers, timeout=10)
-        print(f"Ticketmaster response status: {response.status_code}")
-        print(f"Response body: {response.text[:500]}...")
         if response.status_code == 200:
             data = response.json()
             events = []
@@ -83,15 +82,9 @@ def fetch_ticketmaster_events(city, start_date, end_date, api_key, max_items=25)
                     price = event.get("priceRanges", [{}])[0].get("min", "N/A")
                     price_range = str(price) if price != "N/A" else "N/A"
                     events.append((name, date, venue, city_name, price_range))
-                print(f"Fetched {len(events)} events: {[e[0] for e in events]}")
-            else:
-                print("No events found in response.")
             return events
-        else:
-            print(f"Ticketmaster Error: {response.status_code} - {response.text[:200]}")
-            return []
-    except requests.RequestException as e:
-        print(f"Ticketmaster request failed: {e}")
+        return []
+    except requests.RequestException:
         return []
 
 def store_events(events, db_name="weather.db"):
@@ -106,73 +99,72 @@ def store_events(events, db_name="weather.db"):
     db_path = os.path.join(path, db_name)
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
+
     new_events = 0
     new_venues = 0
-    new_cities = 0
 
-    for event in events:
+    # Only get the first 25 events and store them in the database if they don't already exist
+    for event in events[:25]:
+
         name, date, venue_name, city, price_range = event
-        # Ensure city exists in Cities table
         cursor.execute("SELECT id FROM Cities WHERE city = ?", (city,))
-        city_id = cursor.fetchone()
-        if not city_id:
-            try:
-                cursor.execute("INSERT INTO Cities (city) VALUES (?)", (city,))
-                new_cities += 1
-                cursor.execute("SELECT id FROM Cities WHERE city = ?", (city,))
-                city_id = cursor.fetchone()
-            except sqlite3.IntegrityError:
-                cursor.execute("SELECT id FROM Cities WHERE city = ?", (city,))
-                city_id = cursor.fetchone()
-        city_id = city_id[0]
-        # Insert or get venue_id
+        city_row = cursor.fetchone()
+
+        # if the city id is not in our database, look for another event.
+        if not city_row:
+            continue
+
+        city_id = city_row[0]
+
+        cursor.execute("INSERT OR IGNORE INTO Venues (venue_name, city_id) VALUES (?, ?)", (venue_name, city_id))
+
+        if cursor.rowcount > 0:
+            new_venues += 1
+
         cursor.execute("SELECT venue_id FROM Venues WHERE venue_name = ? AND city_id = ?", (venue_name, city_id))
         venue_id = cursor.fetchone()
-        if not venue_id:
-            try:
-                cursor.execute("INSERT INTO Venues (venue_name, city_id) VALUES (?, ?)", (venue_name, city_id))
-                new_venues += 1
-                cursor.execute("SELECT venue_id FROM Venues WHERE venue_name = ? AND city_id = ?", (venue_name, city_id))
-                venue_id = cursor.fetchone()
-            except sqlite3.IntegrityError:
-                cursor.execute("SELECT venue_id FROM Venues WHERE venue_name = ? AND city_id = ?", (venue_name, city_id))
-                venue_id = cursor.fetchone()
         venue_id = venue_id[0]
-        # Insert event if it doesn't exist
-        cursor.execute("SELECT event_id FROM Events WHERE name = ? AND date = ? AND venue_id = ?", 
-                      (name, date, venue_id))
-        if not cursor.fetchone():
-            try:
-                cursor.execute("INSERT INTO Events (name, date, venue_id, price_range) VALUES (?, ?, ?, ?)",
-                              (name, date, venue_id, price_range))
-                new_events += 1
-            except sqlite3.IntegrityError as e:
-                print(f"Failed to insert event '{name}': {e}")
+        
+        cursor.execute("INSERT OR IGNORE INTO Events (name, date, venue_id, price_range) VALUES (?, ?, ?, ?)",
+                        (name, date, venue_id, price_range))
+        
+        if cursor.rowcount > 0:
+            new_events += 1
+
+
     conn.commit()
-    cursor.execute("SELECT COUNT(*) FROM Events")
-    event_count = cursor.fetchone()[0]
-    cursor.execute("SELECT COUNT(*) FROM Venues")
-    venue_count = cursor.fetchone()[0]
-    cursor.execute("SELECT COUNT(*) FROM Cities")
-    city_count = cursor.fetchone()[0]
-    print(f"Database stats: {event_count} events, {venue_count} venues, {city_count} cities")
     conn.close()
-    return new_events, new_venues, new_cities
+    return new_events, new_venues
 
-def main():
-    """Main function to gather Ticketmaster events and store in database."""
-    init_database()
-    city = input("Enter a city (e.g., New York, Chicago): ").strip().title()
-    start_date = "2025-04-18"
-    end_date = "2025-04-23"
-    api_key = "G1SnItHhk6foswTJuIHEw7iPa9qwb8Ak"
+def gather_events(city, event_date, db_name="weather.db"):
+    """Gather and store Ticketmaster events for a city and date.
     
-    events = fetch_ticketmaster_events(city, start_date, end_date, api_key)
-    if events:
-        new_events, new_venues, new_cities = store_events(events)
-        print(f"Stored {new_events} new events, {new_venues} new venues, {new_cities} new cities.")
-    else:
-        print("No events fetched. Database remains unchanged.")
+    Input:
+        city (str) - City name (e.g., 'New York')
+        event_date (str) - Event date in YYYY-MM-DD
+        db_name (str) - Database file
+    Output: Tuple of (new events stored, new venues stored, new cities stored)
+    """
+    if not city or not isinstance(city, str) or not city.strip():
+        return 0, 0, 0
+    city = city.strip().title()
 
-if __name__ == "__main__":
-    main()
+    init_database(db_name)
+    api_key = "G1SnItHhk6foswTJuIHEw7iPa9qwb8Ak"
+    events = fetch_ticketmaster_events(city, event_date, api_key)
+
+
+    return store_events(events, db_name)
+
+def fetch_and_visualize_events(city, event_date, db_name="weather.db"):
+    """Fetch events and generate visualizations for dashboard.
+    
+    Input:
+        city (str) - City name (e.g., 'New York')
+        event_date (str) - Event date in YYYY-MM-DD
+        db_name (str) - Database file
+    Output: Tuple of (new_events, new_venues, new_cities, table_counts, sample_events, viz_images)
+    """
+    new_events, new_venues = gather_events(city, event_date, db_name)
+    table_counts, sample_events, viz_images = visualize_data(db_name)
+    print(f"Stored {new_events} new events, and {new_venues} new venues.")

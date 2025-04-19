@@ -1,0 +1,6 @@
+Average events per day: 12.33
+Total events stored: 37
+Events per day:
+  2025-04-18: 22
+  2025-04-28: 9
+  2025-04-29: 6
