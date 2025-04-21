@@ -3,6 +3,8 @@ import json
 import os
 import requests
 import re
+from datetime import datetime
+import sys
 
 API_KEY = 'GLVTG3EDCK29FQPYLQLS6Q3F4'
 
@@ -60,6 +62,15 @@ def search_for_weather(city):
         return response.json()
     else:
         return f"Error {response.status_code}"
+    
+def days_from_date(date1_int, date2_int):
+    try:
+        date1 = datetime.strptime(str(date1_int), "%Y%m%d")
+        date2 = datetime.strptime(str(date2_int), "%Y%m%d")
+        delta = date2 - date1
+        return delta.days
+    except ValueError:
+        return None
    
 def create_weather_table(data, cur, conn, days):
     """
@@ -93,13 +104,20 @@ def create_weather_table(data, cur, conn, days):
     else:
         cur.execute("SELECT id FROM Cities WHERE city = ?", (data['address'],))
         city_id = int(cur.fetchone()[0])
-    date = data["days"][days]["datetime"]
+    date = data["days"][0]["datetime"]
+    date = re.sub(r'-', '', date)
+    date = int(date)
+    date_i = days_from_date(date, days)
+    if date_i > 15 or date_i < 0 or date_i == None:
+        print("Error: Please submit a date between today's date and the date 10 days from today.")
+        sys.exit(1)
+    date = data["days"][date_i]["datetime"]
     date = re.sub(r'-', '', date)
     date = int(date)
     cur.execute("SELECT city_id, date FROM Weather WHERE city_id = ? AND date = ?", (city_id, date))
     if cur.fetchone() != None:
         return
-    for temp_dict in data["days"][days]["hours"]:
+    for temp_dict in data["days"][date_i]["hours"]:
         cur.execute("SELECT id FROM Cities WHERE city = ?", (data['address'],))
         city_id = int(cur.fetchone()[0])
         temp = float(temp_dict["temp"])
