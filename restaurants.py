@@ -9,7 +9,7 @@ def search_restaurants(city):
     querystring = {"query":city}
 
     headers = {
-	    "x-rapidapi-key": 'd413013ed7msh1c3d3bacccde12fp1ab893jsn3fb585b475de',
+	    "x-rapidapi-key": '35fa232fc3msh658c7c94c230b6fp1dca3djsn61627f53022a',
 	    "x-rapidapi-host": "tripadvisor16.p.rapidapi.com"
     }
 
@@ -23,7 +23,7 @@ def search_restaurants(city):
     querystring = {"locationId":r}
 
     headers = {
-	    "x-rapidapi-key": 'd413013ed7msh1c3d3bacccde12fp1ab893jsn3fb585b475de',
+	    "x-rapidapi-key": '35fa232fc3msh658c7c94c230b6fp1dca3djsn61627f53022a',
 	    "x-rapidapi-host": "tripadvisor16.p.rapidapi.com"
     }
 
@@ -109,6 +109,8 @@ def restaurant_calc(city,cur,conn):
     plt.savefig("RestaurantsVisual.png")
     plt.show()
 def restaurants_call(cur,conn,city):
+    if(city=="New York"):
+        city="New York City"
     cur.execute("SELECT city_id FROM Restaurants JOIN Cities ON Cities.id = Restaurants.city_id WHERE Cities.city=?",(city,))
     check=cur.fetchone()
     if(not check):
