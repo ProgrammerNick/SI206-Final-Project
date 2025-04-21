@@ -84,7 +84,7 @@ def write_calculations(city_id, city_name, avg_events, counts, db_name="weather.
             WHERE c.id = ?
         """, (city_id,))
         total = cursor.fetchone()[0]
-        with open(output_file, "a") as f:
+        with open(output_file, "w") as f:
             f.write(f"\nCity: {city_name}\n")
             f.write(f"Average events per day: {avg_events:.2f}\n")
             f.write(f"Total events stored: {total}\n")
