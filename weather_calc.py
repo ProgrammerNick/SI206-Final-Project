@@ -4,6 +4,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import time
 import sys
+from datetime import datetime, timedelta
 
 def daily_high_and_low(cur, date, city):
     cur.execute("SELECT id from Cities WHERE city = ?", (city,))
@@ -32,22 +33,22 @@ def daily_avg(cur, day, city):
     conditions = cur.fetchone()[0]
     return temp, humidity, wind_speed, uv_index, precip, conditions, day
 
-def create_avg_chart(cur, city, data):
-    cur.execute("""SELECT DISTINCT Weather.date, Cities.city 
-                FROM Weather 
-                JOIN Cities ON Weather.city_id = Cities.id
-                WHERE Cities.city = ?
-                ORDER BY Weather.date DESC LIMIT 5""", (city,))
+def create_avg_chart(city, data, date_list):
+    # cur.execute("""SELECT DISTINCT Weather.date, Cities.city 
+    #             FROM Weather 
+    #             JOIN Cities ON Weather.city_id = Cities.id
+    #             WHERE Cities.city = ?
+    #             ORDER BY Weather.date DESC LIMIT 5""", (city,))
 
-    dates = [row[0] for row in cur.fetchall()]
-    dates.reverse()
+    # dates = [row[0] for row in cur.fetchall()]
+    # dates.reverse()
     temp = [row[0] for row in data]
     humidity = [row[1] for row in data]
     #print(dates)
     #print(temp)
     fig, ax1 = plt.subplots()
 
-    ax1.plot(dates, temp, 'r-', label='Temperature (°F)')
+    ax1.plot(date_list, temp, 'r-', label='Temperature (°F)')
     ax1.set_ylabel('Temperature (°F)', color='r')
     ax1.tick_params(axis='y', labelcolor='r')
 
@@ -56,7 +57,7 @@ def create_avg_chart(cur, city, data):
     ax2 = ax1.twinx()
 
     # Plot humidity on the right Y-axis
-    ax2.plot(dates, humidity, 'b--', label='Humidity (%)')
+    ax2.plot(date_list, humidity, 'b--', label='Humidity (%)')
     ax2.set_ylabel('Humidity (%)', color='b')
     ax2.tick_params(axis='y', labelcolor='b')
 
@@ -90,6 +91,14 @@ def write_calculations(avg_data, temp_data, filename, city):
         #print(lines)
         f.writelines(lines)
 
+def add_days_to_date(date_int, days):
+    try:
+        date = datetime.strptime(str(date_int), "%Y%m%d")
+        new_date = date + timedelta(days=days)
+        return int(new_date.strftime("%Y%m%d"))
+    except ValueError:
+        return None
+
 def run_weather_app(city, date):
     cur, conn = weather.setup_weather_database("weather.db")
     weather.create_conditions_table(cur, conn)
@@ -97,20 +106,23 @@ def run_weather_app(city, date):
     averages = []
     high_and_low = []
     date = int(date)
+    date_i = date
+    date_list = []
     for i in range(5):
          #print(date)
         weather_dict = weather.search_for_weather(city)
         if isinstance(weather_dict, str):
             print(weather_dict)
             sys.exit(1)
-        weather.create_weather_table(weather_dict, cur, conn, i)
-        averages.append(daily_avg(cur, date, city))
-        high_and_low.append(daily_high_and_low(cur, date, city))
-        date += 1
-        time.sleep(2)
+        weather.create_weather_table(weather_dict, cur, conn, date_i)
+        averages.append(daily_avg(cur, date_i, city))
+        high_and_low.append(daily_high_and_low(cur, date_i, city))
+        date_i = add_days_to_date(date_i, 1)
+        time.sleep(0.5)       
+        date_list.append(date_i)
     #print(averages)
     #print(high_and_low)
-    create_avg_chart(cur, city, averages)
+    create_avg_chart(city, averages, date_list)
     write_calculations(averages, high_and_low, "weather_calculations.txt", city)
 
     #print(weather_dict)
