@@ -150,8 +150,6 @@ def gather_events(city, event_date, db_name="weather.db"):
         db_name (str) - Database file
     Output: Tuple of (new events stored, new venues stored, new cities stored)
     """
-    if not city or not isinstance(city, str) or not city.strip():
-        return 0, 0, 0
     city = city.strip()
 
     init_database(db_name)
