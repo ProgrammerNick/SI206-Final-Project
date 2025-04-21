@@ -28,8 +28,9 @@ def init_database(db_name="weather.db"):
         CREATE TABLE IF NOT EXISTS Events (
             event_id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT UNIQUE,
-            date TEXT,
+            date INTEGER,
             venue_id INTEGER,
+            city_id INTEGER,
             price_range TEXT,
             FOREIGN KEY (venue_id) REFERENCES Venues(venue_id)
         )
@@ -48,7 +49,6 @@ def fetch_ticketmaster_events(city, event_date, api_key, max_items=25):
     Output: List of (name, date, venue_name, city, price_range) tuples
     """
     url = "https://app.ticketmaster.com/discovery/v2/events.json"
-
     pattern = r'^\d{4}-\d{2}-\d{2}$'
     if not re.match(pattern, event_date):
         year = event_date[:4]
@@ -70,22 +70,31 @@ def fetch_ticketmaster_events(city, event_date, api_key, max_items=25):
     }
     try:
         response = requests.get(url, params=params, headers=headers, timeout=10)
-        if response.status_code == 200:
-            data = response.json()
-            events = []
-            if "_embedded" in data and "events" in data["_embedded"]:
-                for event in data["_embedded"]["events"]:
-                    name = event.get("name", "Unknown Event")
-                    date = event["dates"]["start"].get("localDate", "Unknown Date")
-                    venue = event["_embedded"]["venues"][0].get("name", "Unknown Venue") if event["_embedded"].get("venues") else "Unknown Venue"
-                    city_name = event["_embedded"]["venues"][0]["city"].get("name", city) if event["_embedded"].get("venues") else city
-                    price = event.get("priceRanges", [{}])[0].get("min", "N/A")
-                    price_range = str(price) if price != "N/A" else "N/A"
-                    events.append((name, date, venue, city_name, price_range))
-            return events
-        return []
-    except requests.RequestException:
-        return []
+        response.raise_for_status()
+
+        data = response.json()
+        if not data.get("_embedded") or not data["_embedded"].get("events"):
+            raise KeyError(f"No events found for city: {city}")
+
+        if "_embedded" not in data:
+            raise KeyError("Response missing '_embedded' key")
+        if "events" not in data["_embedded"]:
+            raise KeyError("Response missing 'events' key")
+            
+        events = []
+        for event in data["_embedded"]["events"]:
+            name = event.get("name", "Unknown Event")
+            venue = event["_embedded"]["venues"][0].get("name", "Unknown Venue") if event["_embedded"].get("venues") else "Unknown Venue"
+            price = event.get("priceRanges", [{}])[0].get("min", "N/A")
+            price_range = str(price) if price != "N/A" else "N/A"
+            events.append((name, f"{year}{month}{day}", venue, city, price_range))
+        
+        return events
+        
+    except requests.RequestException as e:
+        raise requests.RequestException(f"Network error: {str(e)}")
+    except ValueError as e:
+        raise ValueError(f"Invalid response format: {str(e)}")
 
 def store_events(events, db_name="weather.db"):
     """Store events in SQLite database, avoiding duplicates, using Cities table.
@@ -110,10 +119,6 @@ def store_events(events, db_name="weather.db"):
         cursor.execute("SELECT id FROM Cities WHERE city = ?", (city,))
         city_row = cursor.fetchone()
 
-        # if the city id is not in our database, look for another event.
-        if not city_row:
-            continue
-
         city_id = city_row[0]
 
         cursor.execute("INSERT OR IGNORE INTO Venues (venue_name, city_id) VALUES (?, ?)", (venue_name, city_id))
@@ -125,8 +130,8 @@ def store_events(events, db_name="weather.db"):
         venue_id = cursor.fetchone()
         venue_id = venue_id[0]
         
-        cursor.execute("INSERT OR IGNORE INTO Events (name, date, venue_id, price_range) VALUES (?, ?, ?, ?)",
-                        (name, date, venue_id, price_range))
+        cursor.execute("INSERT OR IGNORE INTO Events (name, date, venue_id, city_id, price_range) VALUES (?, ?, ?, ?, ?)",
+                        (name, date, venue_id, city_id, price_range))
         
         if cursor.rowcount > 0:
             new_events += 1
@@ -134,7 +139,7 @@ def store_events(events, db_name="weather.db"):
 
     conn.commit()
     conn.close()
-    return new_events, new_venues
+    return city_id, new_events, new_venues
 
 def gather_events(city, event_date, db_name="weather.db"):
     """Gather and store Ticketmaster events for a city and date.
@@ -147,7 +152,7 @@ def gather_events(city, event_date, db_name="weather.db"):
     """
     if not city or not isinstance(city, str) or not city.strip():
         return 0, 0, 0
-    city = city.strip().title()
+    city = city.strip()
 
     init_database(db_name)
     api_key = "G1SnItHhk6foswTJuIHEw7iPa9qwb8Ak"
@@ -165,6 +170,6 @@ def fetch_and_visualize_events(city, event_date, db_name="weather.db"):
         db_name (str) - Database file
     Output: Tuple of (new_events, new_venues, new_cities, table_counts, sample_events, viz_images)
     """
-    new_events, new_venues = gather_events(city, event_date, db_name)
-    table_counts, sample_events, viz_images = visualize_data(db_name)
+    city_id, new_events, new_venues = gather_events(city, event_date, db_name)
+    viz_images = visualize_data(city_id, city, db_name)
     print(f"Stored {new_events} new events, and {new_venues} new venues.")
