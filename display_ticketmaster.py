@@ -16,14 +16,14 @@ def calculate_events_per_day(city_id, db_name="weather.db"):
     try:
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
-        cursor.execute(f"""
+        cursor.execute("""
         SELECT e.date, COUNT(e.event_id) 
         FROM Events e
         JOIN (
-            SELECT * FROM Cities WHERE id = {city_id}
+            SELECT * FROM Cities WHERE id = ?
         ) c ON e.city_id = c.id
         GROUP BY e.date
-        """)
+        """, (city_id,))
 
         counts = dict(cursor.fetchall())
         total_days = len(counts)
@@ -44,26 +44,28 @@ def get_venue_distribution(city_id, db_name="weather.db"):
     try:
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
-        cursor.execute(f"""
+        cursor.execute("""
             SELECT v.venue_name, COUNT(e.event_id)
             FROM Events e
             JOIN (
-            SELECT * FROM Cities WHERE id = {city_id}
+            SELECT * FROM Cities WHERE id = ?
             ) c ON e.city_id = c.id
             JOIN Venues v ON e.venue_id = v.venue_id
             GROUP BY v.venue_name
-        """)
+        """, (city_id,))
         distribution = dict(cursor.fetchall())
         conn.close()
         return distribution
     except sqlite3.Error:
         return {}
 
-def write_calculations(avg_events, counts, db_name="weather.db", output_file="events.txt"):
-    """Write calculations to a file.
+def write_calculations(city_id, city_name, avg_events, counts, db_name="weather.db", output_file="events.txt"):
+    """Write city-specific calculations to a file.
     
     Input: 
-        avg_events (float) - Average events
+        city_id (int) - City ID
+        city_name (str) - City name for output clarity
+        avg_events (float) - Average events per day
         counts (dict) - Date:count
         db_name (str) - Database file
         output_file (str) - Output text file
@@ -74,14 +76,21 @@ def write_calculations(avg_events, counts, db_name="weather.db", output_file="ev
     try:
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
-        cursor.execute("SELECT COUNT(*) FROM Events")
+        cursor.execute("""
+            SELECT COUNT(*) 
+            FROM Events e
+            JOIN Venues v ON e.venue_id = v.venue_id
+            JOIN Cities c ON v.city_id = c.id
+            WHERE c.id = ?
+        """, (city_id,))
         total = cursor.fetchone()[0]
-        with open(output_file, "w") as f:
+        with open(output_file, "a") as f:
+            f.write(f"\nCity: {city_name}\n")
             f.write(f"Average events per day: {avg_events:.2f}\n")
             f.write(f"Total events stored: {total}\n")
             f.write("Events per day:\n")
             for date, count in counts.items():
-                f.write(f"  {date}: {count}\n")
+                f.write(f"  {date[:4] + "-" + date[4:6] + "-" + date[6:]}: {count}\n")
         conn.close()
     except sqlite3.Error:
         pass
@@ -90,13 +99,12 @@ def visualize_data(city_id, city_name, db_name="weather.db"):
     """Create three visualizations and return data for dashboard.
     
     Input: db_name (str) - Database file
-    Output: Tuple of (table_counts, sample_events, viz_images)
+    Output: None
     """
 
     avg_events, date_counts = calculate_events_per_day(city_id, db_name)
     venue_dist = get_venue_distribution(city_id, db_name)
-    write_calculations(avg_events, date_counts, db_name)
-    viz_images = []
+    write_calculations(city_id, city_name, avg_events, date_counts, db_name)
 
     if date_counts:
         fig, axs = plt.subplots(nrows=1, ncols=2, figsize=(20, 6))
@@ -125,5 +133,3 @@ def visualize_data(city_id, city_name, db_name="weather.db"):
         plt.tight_layout()
         plt.savefig("events.png")
         plt.show()
-
-    return viz_images

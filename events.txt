@@ -1,4 +1,49 @@
-Average events per day: 10.00
-Total events stored: 190
+City: New York
+Average events per day: 15.60
+Total events stored: 78
 Events per day:
-  20250425: 10
+  20250421: 23
+  20250424: 14
+  20250425: 19
+  20250426: 13
+  20250501: 9
+
+City: Chicago
+Average events per day: 11.10
+Total events stored: 111
+Events per day:
+  20250420: 8
+  20250421: 4
+  20250422: 5
+  20250423: 8
+  20250424: 10
+  20250425: 17
+  20250426: 18
+  20250427: 17
+  20250429: 7
+  20250430: 17
+
+City: Chicago
+Average events per day: 11.10
+Total events stored: 111
+Events per day:
+  2025-04-20: 8
+  2025-04-21: 4
+  2025-04-22: 5
+  2025-04-23: 8
+  2025-04-24: 10
+  2025-04-25: 17
+  2025-04-26: 18
+  2025-04-27: 17
+  2025-04-29: 7
+  2025-04-30: 17
+
+City: New York
+Average events per day: 15.60
+Total events stored: 78
+Events per day:
+  2025-04-21: 23
+  2025-04-24: 14
+  2025-04-25: 19
+  2025-04-26: 13
+  2025-05-01: 9

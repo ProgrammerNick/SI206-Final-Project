@@ -169,5 +169,5 @@ def fetch_and_visualize_events(city, event_date, db_name="weather.db"):
     Output: Tuple of (new_events, new_venues, new_cities, table_counts, sample_events, viz_images)
     """
     city_id, new_events, new_venues = gather_events(city, event_date, db_name)
-    viz_images = visualize_data(city_id, city, db_name)
+    visualize_data(city_id, city, db_name)
     print(f"Stored {new_events} new events, and {new_venues} new venues.")
