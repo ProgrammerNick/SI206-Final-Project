@@ -46,20 +46,25 @@ def create_avg_chart(city, data, date_list):
     humidity = [row[1] for row in data]
     #print(dates)
     #print(temp)
+    plt.clf
     fig, ax1 = plt.subplots()
+    str_date_list = [datetime.strptime(str(x), "%Y%m%d") for x in date_list]
 
-    ax1.plot(date_list, temp, 'r-', label='Temperature (°F)')
+    ax1.plot(str_date_list, temp, 'r-', label='Temperature (°F)')
     ax1.set_ylabel('Temperature (°F)', color='r')
     ax1.tick_params(axis='y', labelcolor='r')
+    ax1.tick_params(axis='x', rotation=45)
 
-    ax1.set_xlabel("Date")
+    ax1.set_xlabel("Date (mm-dd hh)")
 
     ax2 = ax1.twinx()
 
     # Plot humidity on the right Y-axis
-    ax2.plot(date_list, humidity, 'b--', label='Humidity (%)')
+    ax2.plot(str_date_list, humidity, 'b--', label='Humidity (%)')
     ax2.set_ylabel('Humidity (%)', color='b')
     ax2.tick_params(axis='y', labelcolor='b')
+
+    fig.autofmt_xdate()
 
     plt.title(f'Weather Trends in {city}')
     plt.savefig("weather_line_graph.png")
