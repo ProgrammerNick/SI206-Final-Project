@@ -1,52 +1,52 @@
 Weather data for Chicago
 
-Maximum temperature for 42/21/2025 in Chicago: 56.
-Minimum temperature for 42/21/2025 in Chicago: 49.
+Maximum temperature for 42/26/2025 in Chicago: 51.
+Minimum temperature for 42/26/2025 in Chicago: 46.
 
-Maximum temperature for 42/22/2025 in Chicago: 57.
-Minimum temperature for 42/22/2025 in Chicago: 44.
+Maximum temperature for 42/27/2025 in Chicago: 57.
+Minimum temperature for 42/27/2025 in Chicago: 45.
 
-Maximum temperature for 42/23/2025 in Chicago: 58.
-Minimum temperature for 42/23/2025 in Chicago: 52.
+Maximum temperature for 42/28/2025 in Chicago: 65.
+Minimum temperature for 42/28/2025 in Chicago: 52.
 
-Maximum temperature for 42/24/2025 in Chicago: 65.
-Minimum temperature for 42/24/2025 in Chicago: 52.
+Maximum temperature for 42/29/2025 in Chicago: 76.
+Minimum temperature for 42/29/2025 in Chicago: 59.
 
-Maximum temperature for 42/25/2025 in Chicago: 63.
-Minimum temperature for 42/25/2025 in Chicago: 50.
+Maximum temperature for 43/30/2025 in Chicago: 58.
+Minimum temperature for 43/30/2025 in Chicago: 43.
 
-Average temperature for 42/21/2025 in Chicago: 52.5.
-Average humidity for 42/21/2025 in Chicago: 71.5.
-Average wind speed for 42/21/2025 in Chicago: 11.7.
-Average UV index for 42/21/2025 in Chicago: 0.8.
-Average chance of precipitation for 42/21/2025 in Chicago: 61.5.
-Most common conditions for 42/21/2025 in Chicago: Rain.
+Average temperature for 42/26/2025 in Chicago: 48.9.
+Average humidity for 42/26/2025 in Chicago: 74.8.
+Average wind speed for 42/26/2025 in Chicago: 10.7.
+Average UV index for 42/26/2025 in Chicago: 2.1.
+Average chance of precipitation for 42/26/2025 in Chicago: 19.9.
+Most common conditions for 42/26/2025 in Chicago: Partially cloudy.
 
-Average temperature for 42/22/2025 in Chicago: 49.2.
-Average humidity for 42/22/2025 in Chicago: 64.8.
-Average wind speed for 42/22/2025 in Chicago: 5.8.
-Average UV index for 42/22/2025 in Chicago: 2.6.
-Average chance of precipitation for 42/22/2025 in Chicago: 11.5.
-Most common conditions for 42/22/2025 in Chicago: Clear.
+Average temperature for 42/27/2025 in Chicago: 49.9.
+Average humidity for 42/27/2025 in Chicago: 62.9.
+Average wind speed for 42/27/2025 in Chicago: 7.5.
+Average UV index for 42/27/2025 in Chicago: 2.7.
+Average chance of precipitation for 42/27/2025 in Chicago: 6.5.
+Most common conditions for 42/27/2025 in Chicago: Partially cloudy.
 
-Average temperature for 42/23/2025 in Chicago: 52.7.
-Average humidity for 42/23/2025 in Chicago: 71.1.
-Average wind speed for 42/23/2025 in Chicago: 6.8.
-Average UV index for 42/23/2025 in Chicago: 1.8.
-Average chance of precipitation for 42/23/2025 in Chicago: 19.0.
-Most common conditions for 42/23/2025 in Chicago: Partially cloudy.
+Average temperature for 42/28/2025 in Chicago: 57.0.
+Average humidity for 42/28/2025 in Chicago: 69.3.
+Average wind speed for 42/28/2025 in Chicago: 9.0.
+Average UV index for 42/28/2025 in Chicago: 0.9.
+Average chance of precipitation for 42/28/2025 in Chicago: 37.0.
+Most common conditions for 42/28/2025 in Chicago: Partially cloudy.
 
-Average temperature for 42/24/2025 in Chicago: 56.4.
-Average humidity for 42/24/2025 in Chicago: 66.8.
-Average wind speed for 42/24/2025 in Chicago: 6.4.
-Average UV index for 42/24/2025 in Chicago: 0.8.
-Average chance of precipitation for 42/24/2025 in Chicago: 22.1.
-Most common conditions for 42/24/2025 in Chicago: Partially cloudy.
+Average temperature for 42/29/2025 in Chicago: 64.7.
+Average humidity for 42/29/2025 in Chicago: 62.9.
+Average wind speed for 42/29/2025 in Chicago: 10.8.
+Average UV index for 42/29/2025 in Chicago: 2.5.
+Average chance of precipitation for 42/29/2025 in Chicago: 26.9.
+Most common conditions for 42/29/2025 in Chicago: Overcast.
 
-Average temperature for 42/25/2025 in Chicago: 55.5.
-Average humidity for 42/25/2025 in Chicago: 73.2.
-Average wind speed for 42/25/2025 in Chicago: 8.3.
-Average UV index for 42/25/2025 in Chicago: 1.8.
-Average chance of precipitation for 42/25/2025 in Chicago: 45.1.
-Most common conditions for 42/25/2025 in Chicago: Rain.
+Average temperature for 43/30/2025 in Chicago: 50.8.
+Average humidity for 43/30/2025 in Chicago: 58.7.
+Average wind speed for 43/30/2025 in Chicago: 8.7.
+Average UV index for 43/30/2025 in Chicago: 2.1.
+Average chance of precipitation for 43/30/2025 in Chicago: 16.8.
+Most common conditions for 43/30/2025 in Chicago: Overcast.
 
