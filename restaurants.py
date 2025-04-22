@@ -31,12 +31,6 @@ def search_restaurants(city):
 
     return response.json()
 
-
-def setup_database(db_name):
-    path = os.path.dirname(os.path.abspath(__file__))
-    conn = sqlite3.connect(path + "/" + db_name)
-    cur = conn.cursor()
-    return cur, conn
 def create_cuisines_table(restaurants,cur,conn):
     cur.execute(
         "CREATE TABLE IF NOT EXISTS Cuisines (id INTEGER PRIMARY KEY, cuisine TEXT UNIQUE)"
