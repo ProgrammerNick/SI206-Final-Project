@@ -31,12 +31,6 @@ def search_restaurants(city):
 
     return response.json()
 
-
-def setup_database(db_name):
-    path = os.path.dirname(os.path.abspath(__file__))
-    conn = sqlite3.connect(path + "/" + db_name)
-    cur = conn.cursor()
-    return cur, conn
 def create_cuisines_table(restaurants,cur,conn):
     cur.execute(
         "CREATE TABLE IF NOT EXISTS Cuisines (id INTEGER PRIMARY KEY, cuisine TEXT UNIQUE)"
@@ -111,13 +105,14 @@ def restaurant_calc(city,cur,conn):
 def restaurants_call(cur,conn,city):
     if(city=="New York"):
         city="New York City"
-    cur.execute("SELECT city_id FROM Restaurants JOIN Cities ON Cities.id = Restaurants.city_id WHERE Cities.city=?",(city,))
-    check=cur.fetchone()
-    if(not check):
+    try:
         data=search_restaurants(city)
         create_cuisines_table(data,cur,conn)
         create_restaurants_table(data,cur,conn)
-    restaurant_calc(city,cur,conn)
+        restaurant_calc(city,cur,conn)
+    except:
+        print("City not found in the API..Try another city")
+    
 
 
 
