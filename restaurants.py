@@ -9,7 +9,7 @@ def search_restaurants(city):
     querystring = {"query":city}
 
     headers = {
-	    "x-rapidapi-key": '35fa232fc3msh658c7c94c230b6fp1dca3djsn61627f53022a',
+	    "x-rapidapi-key": 'f215748c1amsh203a23f4c97f3bap1ddfd2jsnaac934d98d5a',
 	    "x-rapidapi-host": "tripadvisor16.p.rapidapi.com"
     }
 
@@ -23,7 +23,7 @@ def search_restaurants(city):
     querystring = {"locationId":r}
 
     headers = {
-	    "x-rapidapi-key": '35fa232fc3msh658c7c94c230b6fp1dca3djsn61627f53022a',
+	    "x-rapidapi-key": 'f215748c1amsh203a23f4c97f3bap1ddfd2jsnaac934d98d5a',
 	    "x-rapidapi-host": "tripadvisor16.p.rapidapi.com"
     }
 
@@ -36,10 +36,15 @@ def create_cuisines_table(restaurants,cur,conn):
         "CREATE TABLE IF NOT EXISTS Cuisines (id INTEGER PRIMARY KEY, cuisine TEXT UNIQUE)"
     )
     data=restaurants['data']['data']
-    for i in range(25):
-        cuisine=data[i]['establishmentTypeAndCuisineTags'][0]
+    i = 0
+    c = 0  
+    while c < 25 and i < len(data):
+        cuisine = data[i]['establishmentTypeAndCuisineTags'][0]
         cur.execute("INSERT OR IGNORE INTO Cuisines(cuisine) VALUES (?)", (cuisine,))
-        conn.commit()
+        if cur.rowcount > 0:
+            c += 1
+        i += 1
+    conn.commit()
 
 
 def create_restaurants_table(restaurants,cur,conn):
@@ -47,7 +52,9 @@ def create_restaurants_table(restaurants,cur,conn):
         "CREATE TABLE IF NOT EXISTS Restaurants (id INTEGER PRIMARY KEY, name TEXT UNIQUE, city_id INTEGER, rating INTEGER, user_review_count INTEGER, cuisine_id INTEGER,FOREIGN KEY (city_id) REFERENCES Cities(id),FOREIGN KEY (cuisine_id) REFERENCES Cuisines(id))"
     )
     data=restaurants['data']['data']
-    for i in range(25):
+    i = 0
+    c = 0  
+    while c < 25 and i < len(data):
         rest=data[i]
         name=rest['name']
         rating=rest['averageRating']
@@ -61,7 +68,10 @@ def create_restaurants_table(restaurants,cur,conn):
         cur.execute("""
                     INSERT OR IGNORE INTO Restaurants(name,city_id, rating , user_review_count , 
                     cuisine_id) VALUES (?,?,?,?,?)""",(name,city_id,rating,r_count,cuisine_id))
-        conn.commit()
+        if cur.rowcount > 0:
+            c += 1
+        i += 1
+    conn.commit()
 
 def restaurant_calc(city,cur,conn):
     cur.execute("SELECT id, cuisine FROM Cuisines")
