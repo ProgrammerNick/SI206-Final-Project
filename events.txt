@@ -1,8 +1,7 @@
 
-City: Chicago
-Average events per day: 20.67
-Total events stored: 62
+City: Los Angeles
+Average events per day: 15.50
+Total events stored: 31
 Events per day:
+  2025-04-25: 14
   2025-04-26: 17
-  2025-04-27: 25
-  2025-05-01: 20
