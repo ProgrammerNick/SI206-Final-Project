@@ -8,7 +8,8 @@ from io import BytesIO
 def calculate_events_per_day(city_id, db_name="weather.db"):
     """Calculate average events per day and return counts.
     
-    Input: db_name (str) - Database file
+    Input: city_id (int) - City ID,
+    db_name (str) - Database file
     Output: Tuple of (average events per day, dict of date:count)
     """
     path = os.path.dirname(os.path.abspath(__file__))
@@ -36,7 +37,8 @@ def calculate_events_per_day(city_id, db_name="weather.db"):
 def get_venue_distribution(city_id, db_name="weather.db"):
     """Get count of events per venue.
     
-    Input: db_name (str) - Database file
+    Input: city_id (int) - City ID,
+    db_name (str) - Database file
     Output: Dict of venue_name:count
     """
     path = os.path.dirname(os.path.abspath(__file__))
@@ -98,7 +100,8 @@ def write_calculations(city_id, city_name, avg_events, counts, db_name="weather.
 def visualize_data(city_id, city_name, db_name="weather.db"):
     """Create two visualizations and return data for dashboard.
     
-    Input: db_name (str) - Database file
+    Input: city_id (int) - City ID,
+    db_name (str) - Database file
     Output: None
     """
 
