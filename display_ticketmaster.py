@@ -90,13 +90,13 @@ def write_calculations(city_id, city_name, avg_events, counts, db_name="weather.
             f.write(f"Total events stored: {total}\n")
             f.write("Events per day:\n")
             for date, count in counts.items():
-                f.write(f"  {date[:4] + "-" + date[4:6] + "-" + date[6:]}: {count}\n")
+                f.write(f"  {str(date)[:4] + "-" + str(date)[4:6] + "-" + str(date)[6:]}: {count}\n")
         conn.close()
     except sqlite3.Error:
         pass
 
 def visualize_data(city_id, city_name, db_name="weather.db"):
-    """Create three visualizations and return data for dashboard.
+    """Create two visualizations and return data for dashboard.
     
     Input: db_name (str) - Database file
     Output: None
@@ -110,7 +110,7 @@ def visualize_data(city_id, city_name, db_name="weather.db"):
         fig, axs = plt.subplots(nrows=1, ncols=2, figsize=(20, 6))
 
         # Visualization 1
-        x_vals = [date[:4] + "-" + date[4:6] + "-" + date[6:] for date in date_counts.keys()]
+        x_vals = [str(date)[:4] + "-" + str(date)[4:6] + "-" + str(date)[6:] for date in date_counts.keys()]
         y_vals = list(date_counts.values())
         axs[0].bar(x_vals, y_vals, color="red")
         axs[0].axhline(avg_events, color="red", linestyle="--", label=f"Avg: {avg_events:.2f}")

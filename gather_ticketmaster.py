@@ -19,9 +19,10 @@ def init_database(db_name="weather.db"):
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS Venues (
             venue_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            venue_name TEXT UNIQUE,
+            venue_name TEXT,
             city_id INTEGER,
             FOREIGN KEY (city_id) REFERENCES Cities(id)
+            UNIQUE (venue_name, city_id)
         )
     """)
     cursor.execute("""
@@ -112,12 +113,20 @@ def store_events(events, db_name="weather.db"):
     new_events = 0
     new_venues = 0
 
-    # Only get the first 25 events and store them in the database if they don't already exist
-    for event in events[:25]:
+    print(len(events))
 
-        name, date, venue_name, city, price_range = event
+    i = 0
+
+    # Only store the first 25 events in the database that don't already exist
+    while new_events < 25 and i < len(events):
+
+        name, date, venue_name, city, price_range = events[i]
+
         cursor.execute("SELECT id FROM Cities WHERE city = ?", (city,))
         city_row = cursor.fetchone()
+
+        if not city_row:
+            raise ValueError("City not found in database.")
 
         city_id = city_row[0]
 
@@ -135,6 +144,8 @@ def store_events(events, db_name="weather.db"):
         
         if cursor.rowcount > 0:
             new_events += 1
+        
+        i += 1
 
 
     conn.commit()
