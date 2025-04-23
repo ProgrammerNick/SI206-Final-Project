@@ -8,7 +8,8 @@ from io import BytesIO
 def calculate_events_per_day(city_id, db_name="weather.db"):
     """Calculate average events per day and return counts.
     
-    Input: db_name (str) - Database file
+    Input: city_id (int) - City ID,
+    db_name (str) - Database file
     Output: Tuple of (average events per day, dict of date:count)
     """
     path = os.path.dirname(os.path.abspath(__file__))
@@ -36,7 +37,8 @@ def calculate_events_per_day(city_id, db_name="weather.db"):
 def get_venue_distribution(city_id, db_name="weather.db"):
     """Get count of events per venue.
     
-    Input: db_name (str) - Database file
+    Input: city_id (int) - City ID,
+    db_name (str) - Database file
     Output: Dict of venue_name:count
     """
     path = os.path.dirname(os.path.abspath(__file__))
@@ -90,15 +92,16 @@ def write_calculations(city_id, city_name, avg_events, counts, db_name="weather.
             f.write(f"Total events stored: {total}\n")
             f.write("Events per day:\n")
             for date, count in counts.items():
-                f.write(f"  {date[:4] + "-" + date[4:6] + "-" + date[6:]}: {count}\n")
+                f.write(f"  {str(date)[:4] + "-" + str(date)[4:6] + "-" + str(date)[6:]}: {count}\n")
         conn.close()
     except sqlite3.Error:
         pass
 
 def visualize_data(city_id, city_name, db_name="weather.db"):
-    """Create three visualizations and return data for dashboard.
+    """Create two visualizations and return data for dashboard.
     
-    Input: db_name (str) - Database file
+    Input: city_id (int) - City ID,
+    db_name (str) - Database file
     Output: None
     """
 
@@ -110,7 +113,7 @@ def visualize_data(city_id, city_name, db_name="weather.db"):
         fig, axs = plt.subplots(nrows=1, ncols=2, figsize=(20, 6))
 
         # Visualization 1
-        x_vals = [date[:4] + "-" + date[4:6] + "-" + date[6:] for date in date_counts.keys()]
+        x_vals = [str(date)[:4] + "-" + str(date)[4:6] + "-" + str(date)[6:] for date in date_counts.keys()]
         y_vals = list(date_counts.values())
         axs[0].bar(x_vals, y_vals, color="red")
         axs[0].axhline(avg_events, color="red", linestyle="--", label=f"Avg: {avg_events:.2f}")

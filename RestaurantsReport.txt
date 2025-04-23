@@ -1,2 +1,47 @@
-Restaurants Report for New York
+Restaurants Report for New York City
+
+Italian Restaurants
+Average Rating: 4.7
+Average number of User Reviews: 1583.0
+Highest-rated Restaurant: Piccola Cucina Estiatorio
+
+French Restaurants
+Average Rating: 4.8
+Average number of User Reviews: 919.0
+Highest-rated Restaurant: Le Jardin Bistro
+
+American Restaurants
+Average Rating: 4.5
+Average number of User Reviews: 1102.0
+Highest-rated Restaurant: Bagels & Schmear
+
+Steakhouse Restaurants
+Average Rating: 4.5
+Average number of User Reviews: 3526.0
+Highest-rated Restaurant: Club A Steakhouse
+
+Cafe Restaurants
+Average Rating: 4.9
+Average number of User Reviews: 78.0
+Highest-rated Restaurant: Complete Cafe
+
+Thai Restaurants
+Average Rating: 4.8
+Average number of User Reviews: 886.0
+Highest-rated Restaurant: Bua Thai Ramen & Robata Grill
+
+Mexican Restaurants
+Average Rating: 4.5
+Average number of User Reviews: 924.0
+Highest-rated Restaurant: Los Tacos No. 1
+
+Indian Restaurants
+Average Rating: 4.7
+Average number of User Reviews: 2960.0
+Highest-rated Restaurant: Spice Symphony
+
+Greek Restaurants
+Average Rating: 4.7
+Average number of User Reviews: 684.0
+Highest-rated Restaurant: Loi Estiatorio
 
